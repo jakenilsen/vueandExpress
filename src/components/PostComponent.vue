@@ -46,8 +46,8 @@ export default {
     }
   },
   async created() {
-    this.loading = true;
     try {
+      this.loading = true;
       this.posts = await PostService.getPosts();
     }
     catch (err) {
