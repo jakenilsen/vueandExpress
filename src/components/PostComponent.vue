@@ -9,6 +9,12 @@
     <hr>
     <p class="error" v-if="error">{{ error }}</p>
     <div class="posts-container">
+      <loading class="loader"
+               :active.sync="loading"
+               :can-cancel="true"
+               :opacity="0.4"
+               :is-full-page="false"
+               :on-cancel="onCancel"></loading>
       <div class="post"
            v-for="(post, index) in posts"
            v-bind:item="post"
@@ -25,6 +31,9 @@
 
 <script>
 import PostService from "@/PostService";
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 export default {
   name: 'PostComponent',
@@ -32,25 +41,38 @@ export default {
     return {
       posts: [],
       error: '',
-      text: ''
+      text: '',
+      loading: false
     }
   },
   async created() {
+    this.loading = true;
     try {
       this.posts = await PostService.getPosts();
     }
     catch (err) {
       this.error = err.message;
     }
+    this.loading = false;
+  },
+  components: {
+    Loading
   },
   methods: {
     async createPost() {
       await PostService.insertPost(this.text);
+      this.loading = true;
       this.posts = await PostService.getPosts();
+      this.loading = false;
     },
     async deletePost(id) {
       await PostService.deletePost(id);
+      this.loading = true;
       this.posts = await PostService.getPosts();
+      this.loading = false;
+    },
+    onCancel() {
+      console.log('User cancelled the loader.')
     }
   }
 }
@@ -61,6 +83,12 @@ export default {
   div.container {
     max-width: 800px;
     margin: 0 auto;
+  }
+  .posts-container {
+    position: relative;
+  }
+  .loader {
+    vertical-align: top;
   }
 
   p.error {
