@@ -1,4 +1,5 @@
 # client
+Simple post application where you can create and delete posts.
 
 ## Project setup
 ```
